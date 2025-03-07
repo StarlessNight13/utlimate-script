@@ -12,8 +12,8 @@ import {
   cenelDetectCurrentPage,
   kolnovelDetectCurrentPage,
 } from "../lib/currentPage";
-import { cenelLibraryInit, kolnovelLibraryInit } from "../lib/library/init";
 import { cenelPageInit, kolnovelPageInit } from "@/pages/novel-page";
+import { cenelLibraryInit, kolnovelLibraryInit } from "@/pages/libraray";
 
 export type Pages = "chapter" | "page" | "home" | "user-library";
 
