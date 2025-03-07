@@ -1,0 +1,240 @@
+div:has(div > div > div > div > .adblock_title) {
+  display: none !important;
+}
+
+.chapter-container {
+  margin-bottom: 20px;
+  padding-inline: 10px;
+}
+
+body[data-schema="yellow"] .body-wrap .reading-content,
+body[data-schema="dark"] .body-wrap .reading-content,
+body[data-schema="blue"] .body-wrap .reading-content,
+body[data-schema="default"] .body-wrap .reading-content {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+.background-option {
+  border: 1px solid;
+  display: flex;
+  position: relative;
+  height: 20px;
+  width: 20%;
+}
+
+.background-option::after {
+  content: "✓";
+}
+
+.background-option:hover::after {
+  /* position: absolute; */
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chapter-user-options {
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.modal-body {
+  backdrop-filter: blur(2px);
+}
+
+.chapter-options-link:disabled {
+  filter: saturate(0.5);
+  opacity: 0.5;
+}
+
+.knob,
+.btn-bg {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.loaderToggle {
+  position: relative;
+  top: 50%;
+  width: 74px;
+  height: 36px;
+  margin: -20px auto 0 auto;
+  overflow: hidden;
+}
+.btn.btn-rect {
+  border-radius: 2px;
+}
+.checkbox {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 3;
+}
+
+.knob {
+  z-index: 2;
+}
+
+.btn-bg {
+  width: 100%;
+  background-color: #ebf7fc;
+  transition: 0.3s ease all;
+  z-index: 1;
+}
+
+#toggle-container {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  line-height: 1;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#toggle-container .knob:before {
+  content: "OFF";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 40%;
+  height: 80%;
+  color: #fff;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 1;
+  padding: 9px 4px;
+  background-color: #f44336;
+  border-radius: 2px;
+  transition: 0.3s ease all, left 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#toggle-container .checkbox:active + .knob:before {
+  width: 46px;
+}
+
+#toggle-container .checkbox:checked:active + .knob:before {
+  margin-left: -26px;
+}
+
+#toggle-container .checkbox:checked + .knob:before {
+  content: "ON";
+  left: 42px;
+  background-color: #03a9f4;
+}
+
+#toggle-container .checkbox:checked ~ .btn-bg {
+  background-color: #fcebeb;
+}
+
+.btn-1,
+.btn-1 *,
+.btn-1 :after,
+.btn-1 :before,
+.btn-1:after,
+.btn-1:before {
+  border: 0 solid;
+  box-sizing: border-box;
+}
+.btn-1 {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-appearance: button;
+  background-color: #000;
+  background-image: none;
+  color: #fff;
+  cursor: pointer;
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, sans-serif,
+    Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+  font-size: 100%;
+  font-weight: 900;
+  line-height: 1.5;
+  margin: 0;
+  -webkit-mask-image: -webkit-radial-gradient(#000, #fff);
+  padding: 0;
+  text-transform: uppercase;
+}
+.btn-1:disabled {
+  cursor: default;
+}
+.btn-1:-moz-focusring {
+  outline: auto;
+}
+.btn-1 svg {
+  display: block;
+}
+.btn-1 [hidden] {
+  display: none;
+}
+.btn-1 {
+  border-radius: 4px;
+  border-width: 2px;
+  padding: 0.8rem 3rem;
+}
+.btn-1:hover {
+  color: #999;
+}
+
+#alayahya-reader-settings .modal-content {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+@media (prefers-color-scheme: dark) {
+  #alayahya-reader-settings .modal-content {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+  }
+  #alayahya-reader-settings h3,
+  #alayahya-reader-settings h4 {
+    color: white;
+  }
+}
+
+.removeELements[host="kolnovel"] {
+  #menu-item-185962,
+  #menu-item-185963,
+  #content > div > div.announ,
+  article > div.announ,
+  article > div.bixbox.episodedl > div.epwrapper > div.socialts,
+  article > div.bixbox.episodedl > div.bixbox,
+  #Bottum_Down {
+    display: none !important;
+  }
+}
+
+.removeELements[host="cenel"] {
+  .social-share,
+  .entry-content_wrap > h2:nth-child(1),
+  .chapter-warning,
+  div.row:nth-child(3),
+  .footer-counter,
+  .read-container > h3:nth-child(3),
+  .read-container > h3:nth-child(4),
+  div.c-sidebar.c-top-second-sidebar.wp-manga,
+  div.c-sidebar.c-top-sidebar.wp-manga,
+  #manga-reading-nav-head > div > div.entry-header_wrap > div > div.action-icon,
+  #nav-menu-item-67965 {
+    display: none !important;
+  }
+}
