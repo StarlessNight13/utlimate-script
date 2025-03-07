@@ -35,7 +35,6 @@ export class NovelComponent {
       .toArray();
 
     const readChaptersCount = novelChapters.length;
-    console.log("🚀 ~ NovelComponent ~ render ~ novelChapters:", novelChapters);
 
     // find the first chapter that is not read
     const unFinishedChapter = novelChapters.find(

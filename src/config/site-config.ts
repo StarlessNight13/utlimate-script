@@ -79,7 +79,7 @@ export interface SiteConfig {
   currentPage: () => Pages;
   chapterFuncs: {
     openSettingsFunc: () => void;
-    appendToggleFunc: () => void;
+    appendToggleFunc: (handleClick: (value: boolean) => void) => void;
     chapterStyle: (config: SiteConfig) => void;
   };
   initNovelPage: () => Promise<void>;

@@ -4,6 +4,7 @@ export interface UniversalConfig {
   initDelay: number;
   urlUpdateThreshold: number;
   debugMode: boolean;
+  localStorageKey: string;
 }
 
 export const UNIVERSAL_CONFIG: UniversalConfig = {
@@ -12,6 +13,5 @@ export const UNIVERSAL_CONFIG: UniversalConfig = {
   initDelay: 2000,
   urlUpdateThreshold: 10,
   debugMode: true,
+  localStorageKey: "autoLoaderState",
 } as const;
-
-

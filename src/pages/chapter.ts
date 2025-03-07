@@ -1,11 +1,13 @@
 import { SiteConfig } from "@/config/site-config";
-import startChapterObserver from "@/managers/ChapterObserver";
+import { UNIVERSAL_CONFIG } from "@/config/universal-config";
+import { ElementViewTracker } from "@/managers/ChapterObserver";
+import { URLManager } from "@/managers/URLManager";
 
 const getAutoLoaderState = (): boolean => {
-  const localState = localStorage.getItem("autoLoaderState");
+  const localState = localStorage.getItem(UNIVERSAL_CONFIG.localStorageKey);
 
   if (!localState) {
-    localStorage.setItem("autoLoaderState", "false");
+    localStorage.setItem(UNIVERSAL_CONFIG.localStorageKey, "false");
     return false;
   }
 
@@ -23,13 +25,30 @@ const updateBodyClasses = (isEnabled: boolean): void => {
 export default async function initChapter(siteConfig: SiteConfig) {
   const autoLoaderEnabled = getAutoLoaderState();
   updateBodyClasses(autoLoaderEnabled);
+  let elementViewTracker: ElementViewTracker | null = null;
+  let urlManager: URLManager | null = null;
 
   const params = new URLSearchParams(window.location.search);
 
   if (params.get("autoLoaderDisabled") === "true") return;
 
-  if (autoLoaderEnabled) await startChapterObserver(siteConfig);
+  if (autoLoaderEnabled) {
+    elementViewTracker = new ElementViewTracker(siteConfig);
+    urlManager = new URLManager();
+  }
 
-  siteConfig.chapterFuncs.appendToggleFunc();
+  function handleClick(value: boolean) {
+    if (value && !elementViewTracker && !urlManager) {
+      elementViewTracker = new ElementViewTracker(siteConfig);
+      urlManager = new URLManager();
+    } else if (!value && elementViewTracker && urlManager) {
+      elementViewTracker.destroy();
+      urlManager.destroy();
+      elementViewTracker = null;
+      urlManager = null;
+    }
+  }
+
+  siteConfig.chapterFuncs.appendToggleFunc(handleClick);
   siteConfig.chapterFuncs.chapterStyle(siteConfig);
 }

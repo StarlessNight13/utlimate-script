@@ -1,4 +1,5 @@
 import { Create } from "@/components/creat-element";
+import { UNIVERSAL_CONFIG } from "@/config/universal-config";
 import { Bot, createElement } from "lucide";
 
 const updateBodyClasses = (isEnabled: boolean): void => {
@@ -9,9 +10,9 @@ const updateBodyClasses = (isEnabled: boolean): void => {
   }
 };
 
-export function appendCeneleToggle() {
+export function appendCeneleToggle(handleClick: (value: boolean) => void) {
   // Toggle
-  const toggle = creatToggle();
+  const toggle = creatToggle(handleClick);
   const section = document.createElement("section");
   const header = document.createElement("h4");
   header.textContent = "Auto Loader";
@@ -27,8 +28,8 @@ export function appendCeneleToggle() {
   }
 }
 
-export function appendKolnovelToggle() {
-  const toggle = creatToggle();
+export function appendKolnovelToggle(handleClick: (value: boolean) => void) {
+  const toggle = creatToggle(handleClick);
   const section = Create.div({
     className: "optx-group",
     children: [
@@ -40,13 +41,15 @@ export function appendKolnovelToggle() {
     ],
   });
 
-  const modal = document.querySelector(".optx-content") as HTMLDivElement | null;
+  const modal = document.querySelector(
+    ".optx-content"
+  ) as HTMLDivElement | null;
   if (modal) {
     modal.appendChild(section);
   }
 }
 
-function creatToggle() {
+function creatToggle(handleClick: (value: boolean) => void) {
   const toggleContainer = Create.div({
     className: "toggle-container",
     id: "toggle-container",
@@ -58,18 +61,22 @@ function creatToggle() {
   userSettingsItemInput.id = "auto-loader-toggle";
   toggleContainer.appendChild(userSettingsItemInput);
 
-  const savedSetting = localStorage.getItem("autoLoaderState");
+  const savedSetting = localStorage.getItem(UNIVERSAL_CONFIG.localStorageKey);
   if (savedSetting) {
     userSettingsItemInput.checked = true;
   } else {
-    localStorage.setItem("autoLoaderState", "false");
+    localStorage.setItem(UNIVERSAL_CONFIG.localStorageKey, "false");
   }
   userSettingsItemInput.addEventListener("change", (e) => {
     const target = e.target as HTMLInputElement;
     const autoLoaderState = target.checked;
     updateBodyClasses(autoLoaderState);
     // Update localStorage
-    localStorage.setItem("autoLoaderState", String(autoLoaderState));
+    localStorage.setItem(
+      UNIVERSAL_CONFIG.localStorageKey,
+      String(autoLoaderState)
+    );
+    handleClick(autoLoaderState);
   });
 
   const userSettingsItemLabel = document.createElement("label");

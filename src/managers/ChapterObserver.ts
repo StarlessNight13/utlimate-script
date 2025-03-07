@@ -1,11 +1,11 @@
-
 import { Create } from "@/components/creat-element";
 import { NotificationManager } from "@/components/Notification";
 import { SiteConfig } from "@/config/site-config";
+import { UNIVERSAL_CONFIG } from "@/config/universal-config";
 import { Chapter, db } from "@/db";
-import { processChapterContent } from "@/lib/chapter/chapterFunc";
-import { URLManager } from "./URLManager";
+import { DOMUtils } from "@/utils/dom";
 import { Book, createElement } from "lucide";
+import { URLManager } from "./URLManager";
 
 interface TrackingState {
   start: boolean;
@@ -17,13 +17,15 @@ type ChapterData = {
   chapter: Chapter | null;
 };
 
-class ElementViewTracker {
+export class ElementViewTracker {
   private observedElements = new Set<HTMLElement>();
+  private ElementObservers = new Map<number, IntersectionObserver>();
   private mutationObserver: MutationObserver | null = null;
   private config: SiteConfig;
   private novelId: number | null = null;
   private trackingState = new Map<number, TrackingState>();
   private currentChapterData: ChapterData;
+  private options = new Set<string>();
 
   constructor(config: SiteConfig) {
     this.config = config;
@@ -83,6 +85,8 @@ class ElementViewTracker {
       end: false,
     };
 
+    if (this.ElementObservers.has(index)) return;
+
     const currentState = this.trackingState.get(index) || initialState;
 
     const observer = new IntersectionObserver(
@@ -90,7 +94,6 @@ class ElementViewTracker {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const placement = entry.target.getAttribute("data-placement");
-
             if (placement === "top" && !currentState.start) {
               this.startFunction(element);
               this.trackingState.set(index, {
@@ -117,6 +120,7 @@ class ElementViewTracker {
     );
 
     observer.observe(element);
+    this.ElementObservers.set(index, observer);
   }
 
   /**
@@ -138,13 +142,12 @@ class ElementViewTracker {
         url
       );
 
-      container.append(
-        this.createUserOptions(
-          title,
-          nextChapterUrl,
-          this.config.chapterFuncs.openSettingsFunc
-        )
+      const userOptions = this.createUserOptions(
+        title,
+        url,
+        this.config.chapterFuncs.openSettingsFunc
       );
+      if (userOptions) container.append(userOptions);
 
       Object.assign(container.style, {
         fontSize: "var(--font-size)",
@@ -191,14 +194,16 @@ class ElementViewTracker {
    */
   private createUserOptions(
     title: string,
-    chapterUrl: string | null,
+    chapterUrl: string,
     openSettingsFunc: () => void
-  ): HTMLDivElement {
+  ): HTMLDivElement | null {
+    if (this.options.has(chapterUrl)) return null;
+    this.options.add(chapterUrl);
     return Create.div({
       className: "tw:flex tw:flex-col tw:p-4 tw:w-full tw:h-full tw:gap-4",
       children: [
         Create.a({
-          href: chapterUrl ?? "#",
+          href: chapterUrl,
           textContent: title,
           className: "chapter-options-link endless-link",
           attributes: {
@@ -316,10 +321,6 @@ class ElementViewTracker {
    */
   private async loadNextChapter(): Promise<void> {
     const dataNextUrl = this.currentChapterData?.nextChapterUrl;
-    console.log(
-      "🚀 ~ ElementViewTracker ~ loadNextChapter ~ dataNextUrl:",
-      dataNextUrl
-    );
     if (!dataNextUrl || dataNextUrl === "404") {
       NotificationManager.show({
         message: "No next chapter found",
@@ -327,6 +328,9 @@ class ElementViewTracker {
       });
       return;
     }
+    // Check if auto loader is disabled
+    if (localStorage.getItem(UNIVERSAL_CONFIG.localStorageKey) === "false")
+      return;
 
     try {
       const urlObject = new URL(dataNextUrl);
@@ -426,13 +430,12 @@ class ElementViewTracker {
     const nextChapterUrl = nextUrl?.href ?? "404";
 
     // Add user options
-    currentChapter.appendChild(
-      this.createUserOptions(
-        chapterTitle,
-        nextChapterUrl,
-        this.config.chapterFuncs.openSettingsFunc
-      )
+    const userOptions = this.createUserOptions(
+      chapterTitle,
+      nextChapterUrl ? nextChapterUrl : "#",
+      this.config.chapterFuncs.openSettingsFunc
     );
+    if (userOptions) currentChapter.appendChild(userOptions);
 
     // Set up the chapter for tracking
     currentChapter.classList.add("chapter-container", "track-content");
@@ -507,6 +510,10 @@ class ElementViewTracker {
     }
     this.observedElements.clear();
     this.trackingState.clear();
+    this.ElementObservers.forEach((observer) => {
+      observer.disconnect();
+    });
+    this.ElementObservers.clear();
   }
 }
 
@@ -518,4 +525,96 @@ export default async function startChapterObserver(
 ): Promise<void> {
   new ElementViewTracker(config);
   new URLManager();
+}
+
+/**
+ * Processes chapter content and returns the title, next chapter URL, and container element
+ */
+
+function processChapterContent(
+  doc: Document,
+  config: SiteConfig,
+  url: string
+): {
+  title: string;
+  nextChapterUrl: string | null;
+  container: HTMLDivElement;
+} {
+  const containerElement = doc.querySelector<HTMLDivElement>(
+    config.selectors.contentContainer
+  );
+  if (!containerElement) throw new Error("Content container not found");
+
+  if (window.location.hostname === "kolbook.xyz") {
+    const classesToRemove = DOMUtils.extractClassesFromStyle(
+      doc,
+      "article > style:nth-child(2)"
+    );
+    classesToRemove.forEach((className) => {
+      containerElement
+        .querySelectorAll(`.${className}`)
+        .forEach((el) => el.remove());
+    });
+  }
+  const contentElement = containerElement.querySelector(
+    config.selectors.content
+  ) as HTMLDivElement | null;
+  if (!contentElement) throw new Error("Content element not found");
+
+  const title =
+    doc.querySelector(config.selectors.title)?.textContent || "Unknown Chapter";
+  const nextChapterUrl =
+    doc.querySelector<HTMLAnchorElement>(config.selectors.nextLink)?.href ??
+    null;
+
+  const container = Create.div({
+    className: "chapter-container track-content",
+    attributes: {
+      "data-url": url,
+      "data-chapter-title": title,
+      "data-next-url": nextChapterUrl ?? "404",
+    },
+    children: [
+      Create.div({
+        className: "tw:w-full tw:h-px sentianl",
+        attributes: {
+          "data-url": url,
+          "data-chapter-title": title,
+          "data-next-url": nextChapterUrl ?? "404",
+          "data-placement": "top",
+        },
+      }),
+      ...Array.from(contentElement.children),
+      Create.div({
+        className: "tw:w-full tw:h-px sentianl",
+        attributes: {
+          "data-url": url,
+          "data-chapter-title": title,
+          "data-next-url": nextChapterUrl ?? "404",
+          "data-placement": "middle",
+        },
+      }),
+      Create.div({
+        className: "tw:w-full tw:h-px sentianl",
+        attributes: {
+          "data-url": url,
+          "data-chapter-title": title,
+          "data-next-url": nextChapterUrl ?? "404",
+          "data-placement": "bottom",
+        },
+      }),
+    ],
+  });
+
+  Object.assign(container.style, {
+    fontSize: "var(--font-size)",
+    lineHeight: "var(--line-height)",
+    fontFamily: "var(--font-family)",
+  });
+
+  return {
+    title,
+    nextChapterUrl,
+    container,
+  };
 }
