@@ -3,7 +3,7 @@ name: publish-release-action
 on:
   push:
     branches:
-      - master
+      - main
 
 permissions:
   contents: write
