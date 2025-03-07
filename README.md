@@ -35,16 +35,10 @@ This userscript is not affiliated with any novel reading sites or their respecti
 - claude - was about to make JDSL... but then I stopped it.
 - supermaven - for the idea of using JDSL.
 
-## TNV
+# TODOs
 
-what is TNV?
+### -> make it more maintainable
 
-TNV, or The New Voice, is a programming language designed to be spoken rather than written. The compiler then converts it into JavaScript code. TNV is a hybrid language that combines the expressiveness of JavaScript with the readability of a human-written language.
-
-JDSL is a programming language based on TNV. In contrast to TNV, JDSL is written rather than spoken. The compiler then converts it into ChatGPT prompts, which are then used to generate the final JavaScript code.
-
-why are both languages compiled to JavaScript?
-
-Both TNV and JDSL are compiled to JavaScript because they are designed to be used in a JavaScript environment. JS is blzing fast, and type safe, and improving over time.
-
-JDSL was inspired by the [Gulf of Mexico](https://github.com/TodePond/GulfOfMexico) Language.
+-> make it more readable
+-> make it more efficient
+-> make it more customizable
