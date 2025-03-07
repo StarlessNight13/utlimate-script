@@ -23,7 +23,7 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Build
-        run: bun run build:workflow && rm -rf dist/index.js
+        run: bun run tsc && vite build
 
       - name: Release
         uses: softprops/action-gh-release@v2
